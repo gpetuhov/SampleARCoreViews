@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
-import android.widget.TextView
+import android.widget.Button
 import com.google.ar.core.HitResult
 import com.google.ar.core.Plane
 import com.google.ar.sceneform.AnchorNode
@@ -85,8 +85,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun initControls(view: View) {
         // Find views and set click listeners as usual
-        val hello = view.findViewById<TextView>(R.id.hello)
-        hello?.setOnClickListener { toast("Hello") }
+        val generateButton = view.findViewById<Button>(R.id.generateButton)
+        generateButton?.setOnClickListener { toast("Generate") }
     }
 
     private fun initArFragment() {
