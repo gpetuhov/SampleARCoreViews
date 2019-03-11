@@ -12,7 +12,9 @@ import android.widget.Button
 import com.google.ar.core.HitResult
 import com.google.ar.core.Plane
 import com.google.ar.sceneform.AnchorNode
-import com.google.ar.sceneform.rendering.ViewRenderable
+import com.google.ar.sceneform.Node
+import com.google.ar.sceneform.math.Vector3
+import com.google.ar.sceneform.rendering.*
 import com.google.ar.sceneform.ux.ArFragment
 import com.google.ar.sceneform.ux.TransformableNode
 import com.pawegio.kandroid.toast
@@ -25,6 +27,8 @@ class MainActivity : AppCompatActivity() {
 
     private var arFragment: ArFragment? = null
     private var viewRenderable: ViewRenderable? = null
+    private var redSphereRenderable: ModelRenderable? = null
+    private var anchorNode: AnchorNode? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +40,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         loadView()
+        generateSphere()
         initArFragment()
     }
 
@@ -86,7 +91,7 @@ class MainActivity : AppCompatActivity() {
     private fun initControls(view: View) {
         // Find views and set click listeners as usual
         val generateButton = view.findViewById<Button>(R.id.generateButton)
-        generateButton?.setOnClickListener { toast("Generate") }
+        generateButton?.setOnClickListener { addSphereToScene() }
     }
 
     private fun initArFragment() {
@@ -101,12 +106,34 @@ class MainActivity : AppCompatActivity() {
         }
 
         val anchor = hitResult.createAnchor()
-        val anchorNode = AnchorNode(anchor)
-        anchorNode.setParent(arFragment?.arSceneView?.scene)
+        anchorNode = AnchorNode(anchor)
+        anchorNode?.setParent(arFragment?.arSceneView?.scene)
 
         val model = TransformableNode(arFragment?.transformationSystem)
         model.setParent(anchorNode)
         model.renderable = viewRenderable
+
+        // This places our view a little above the plane
+        model.localPosition = Vector3(0.0f, 0.1f, 0.0f)
+
         model.select()
+    }
+
+    private fun generateSphere() {
+        MaterialFactory
+            .makeOpaqueWithColor(this, Color(android.graphics.Color.RED))
+            .thenAccept { material ->
+                redSphereRenderable = ShapeFactory.makeSphere(0.05f, Vector3(0.0f, 0.05f, 0.0f), material)
+            }
+    }
+
+    private fun addSphereToScene() {
+        if (anchorNode == null || redSphereRenderable == null) {
+            return
+        }
+
+        val sphere = Node()
+        sphere.setParent(anchorNode)
+        sphere.renderable = redSphereRenderable
     }
 }
