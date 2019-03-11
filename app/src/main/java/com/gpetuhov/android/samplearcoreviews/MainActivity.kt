@@ -7,6 +7,7 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MotionEvent
+import android.widget.TextView
 import com.google.ar.core.HitResult
 import com.google.ar.core.Plane
 import com.google.ar.sceneform.AnchorNode
@@ -35,10 +36,18 @@ class MainActivity : AppCompatActivity() {
 
         arFragment = supportFragmentManager.findFragmentById(R.id.arFragment) as ArFragment
 
+        // TODO: refactor this
+
         ViewRenderable.builder()
             .setView(this, R.layout.controls_view)
             .build()
-            .thenAccept { renderable -> viewRenderable = renderable }
+            .thenAccept { renderable ->
+                viewRenderable = renderable
+
+                val controlsView = renderable.view
+                val hello = controlsView.findViewById<TextView>(R.id.hello)
+                hello.setOnClickListener { toast("Hello") }
+            }
             .exceptionally { throwable ->
                 toast("Unable to load renderable")
                 null
