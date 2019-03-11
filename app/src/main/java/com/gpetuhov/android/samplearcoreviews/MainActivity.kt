@@ -6,6 +6,13 @@ import android.content.Context
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.MotionEvent
+import com.google.ar.core.HitResult
+import com.google.ar.core.Plane
+import com.google.ar.sceneform.AnchorNode
+import com.google.ar.sceneform.rendering.ViewRenderable
+import com.google.ar.sceneform.ux.ArFragment
+import com.google.ar.sceneform.ux.TransformableNode
 import com.pawegio.kandroid.toast
 
 class MainActivity : AppCompatActivity() {
@@ -13,6 +20,9 @@ class MainActivity : AppCompatActivity() {
     companion object {
         const val MIN_OPENGL_VERSION = 3.0
     }
+
+    private var arFragment: ArFragment? = null
+    private var viewRenderable: ViewRenderable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,6 +32,32 @@ class MainActivity : AppCompatActivity() {
         }
 
         setContentView(R.layout.activity_main)
+
+        arFragment = supportFragmentManager.findFragmentById(R.id.arFragment) as ArFragment
+
+        ViewRenderable.builder()
+            .setView(this, R.layout.controls_view)
+            .build()
+            .thenAccept { renderable -> viewRenderable = renderable }
+            .exceptionally { throwable ->
+                toast("Unable to load renderable")
+                null
+            }
+
+        arFragment?.setOnTapArPlaneListener { hitResult: HitResult, plane: Plane, motionEvent: MotionEvent ->
+            if (viewRenderable == null) {
+                return@setOnTapArPlaneListener
+            }
+
+            val anchor = hitResult.createAnchor()
+            val anchorNode = AnchorNode(anchor)
+            anchorNode.setParent(arFragment?.arSceneView?.scene)
+
+            val model = TransformableNode(arFragment?.transformationSystem)
+            model.setParent(anchorNode)
+            model.renderable = viewRenderable
+            model.select()
+        }
     }
 
     /**
