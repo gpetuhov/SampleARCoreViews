@@ -68,6 +68,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadView() {
+        // Create renderable from the view layout.
+        // This will be rendered as flat card in the scene.
         ViewRenderable.builder()
             .setView(this, R.layout.controls_view)
             .build()
@@ -82,6 +84,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initControls(view: View) {
+        // Find views and set click listeners as usual
         val hello = view.findViewById<TextView>(R.id.hello)
         hello?.setOnClickListener { toast("Hello") }
     }
@@ -91,6 +94,7 @@ class MainActivity : AppCompatActivity() {
         arFragment?.setOnTapArPlaneListener(::onPlaneTap)
     }
 
+    // Show ViewRenderable in the place of tap
     private fun onPlaneTap(hitResult: HitResult, plane: Plane, motionEvent: MotionEvent) {
         if (viewRenderable == null) {
             return
