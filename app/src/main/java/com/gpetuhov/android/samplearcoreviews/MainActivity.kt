@@ -106,6 +106,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         val anchor = hitResult.createAnchor()
+
+        // We keep the anchor at hit point,
+        // so that we are able to add our red sphere to it later.
         anchorNode = AnchorNode(anchor)
         anchorNode?.setParent(arFragment?.arSceneView?.scene)
 
@@ -119,10 +122,13 @@ class MainActivity : AppCompatActivity() {
         model.select()
     }
 
+    // Programmatically models are created in advance like views and models from assets
     private fun generateSphere() {
         MaterialFactory
             .makeOpaqueWithColor(this, Color(android.graphics.Color.RED))
             .thenAccept { material ->
+                // Center of this sphere is positioned at R above the plane, where R is radius
+                // (this is needed, so that sphere will lay upon the plane).
                 redSphereRenderable = ShapeFactory.makeSphere(0.05f, Vector3(0.0f, 0.05f, 0.0f), material)
             }
     }
@@ -132,6 +138,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        // Add programmatically created sphere to previously saved anchor
         val sphere = Node()
         sphere.setParent(anchorNode)
         sphere.renderable = redSphereRenderable
